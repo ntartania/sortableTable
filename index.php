@@ -1,27 +1,4 @@
-<html>
-	<body class="yui-skin-sam"><div id="basic"></div></body>
-	<!--CSS file (default YUI Sam Skin) -->
-	<link type="text/css" rel="stylesheet" href="http://yui.yahooapis.com/2.9.0/build/datatable/assets/skins/sam/datatable.css">
-	 
-	<!-- Dependencies -->
-	<script src="http://yui.yahooapis.com/2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-	<script src="http://yui.yahooapis.com/2.9.0/build/element/element-min.js"></script>
-	<script src="http://yui.yahooapis.com/2.9.0/build/datasource/datasource-min.js"></script>
-	 
-	<!-- OPTIONAL: JSON Utility (for DataSource) -->
-	<script src="http://yui.yahooapis.com/2.9.0/build/json/json-min.js"></script>
-	 
-	<!-- OPTIONAL: Connection Manager (enables XHR for DataSource) -->
-	<script src="http://yui.yahooapis.com/2.9.0/build/connection/connection-min.js"></script>
-	 
-	<!-- OPTIONAL: Get Utility (enables dynamic script nodes for DataSource) -->
-	<script src="http://yui.yahooapis.com/2.9.0/build/get/get-min.js"></script>
-	 
-	<!-- Source files -->
-	<script src="http://yui.yahooapis.com/2.9.0/build/datatable/datatable-min.js"></script>
-	 
-</html>
-
+<p>This text should be before the table</p>
 <?php
 	require_once('sortableTable.php');
 	$data = array(
@@ -38,5 +15,7 @@
 		$table->add_row($row);
 	}
 
-	echo "<script>".$table->generate_dataset()."</script>";
-	echo "<script>".$table->generate_table_script()."</script>";
+	$table->print_table();
+?>
+
+<div id="dtable" class="yui-skin-sam"></div>

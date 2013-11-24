@@ -28,92 +28,6 @@ class SortableTable {
 		$this->row_count++;
 	}
 
-	public function generate_dataset() {
-		$script  = "Data = {\n";
-		$script .= "	table: [\n";
-		//Add multiple rows here
-		$script .= $this->generate_rows();
-		$script .= "\n	]\n";
-		$script .= "}";
-		return $script;
-	}
-
-	public function generate_table_script() {
-		$script  = "YAHOO.util.Event.addListener(window, 'load', function() {\n";
-		$script .= "	YAHOO.example.Basic = function() {\n";
-
-		//column defs here
-		$script .= $this->generate_column_defs();
-		
-		$script .= "		var myDataSource = new YAHOO.util.DataSource(Data.table);\n";
-		$script .= "		myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;\n";
-
-		//schema here
-		$script .= $this->generate_schema();
-
-		$script .= "		var myDataTable = new YAHOO.widget.DataTable('basic',\n";
-		$script .= "				myColumnDefs, myDataSource);\n";
-		
-		$script .= "		return {\n";
-		$script .= "			oDS: myDataSource,\n";
-		$script .= "			oDT: myDataTable\n";
-		$script .= "		};\n";
-		$script .= "	}();\n";
-		$script .= "});\n";
-
-		return $script;
-	}
-
-	public function generate_external_includes() {
-		return "<body class='yui-skin-sam'><div id='basic'></div></body>".
-		"<!--CSS file (default YUI Sam Skin) -->
-		<link type='text/css' rel='stylesheet' href='http://yui.yahooapis.com/2.9.0/build/datatable/assets/skins/sam/datatable.css'>".
-		 
-		"<!-- Dependencies -->".
-		"<script src='http://yui.yahooapis.com/2.9.0/build/yahoo-dom-event/yahoo-dom-event.js'></script>".
-		"<script src='http://yui.yahooapis.com/2.9.0/build/element/element-min.js'></script>".
-		"<script src='http://yui.yahooapis.com/2.9.0/build/datasource/datasource-min.js'></script>".
-		 
-		// "<!-- OPTIONAL: JSON Utility (for DataSource) -->
-		// 		<script src='http://yui.yahooapis.com/2.9.0/build/json/json-min.js'></script>".
-		 
-		// "<!-- OPTIONAL: Connection Manager (enables XHR for DataSource) -->
-		// 		<script src='http://yui.yahooapis.com/2.9.0/build/connection/connection-min.js'></script>".
-		 
-		// "<!-- OPTIONAL: Get Utility (enables dynamic script nodes for DataSource) -->
-		// 		<script src='http://yui.yahooapis.com/2.9.0/build/get/get-min.js'></script>".
-		 
-		"<!-- Source files -->
-				<script src='http://yui.yahooapis.com/2.9.0/build/datatable/datatable-min.js'></script>";
-	}
-
-	public function print_table() {
-		$script  = "<div>";
-		$script .= $this->generate_external_includes();
-		$script .= "<script>".$this->generate_dataset()."</script>";
-		$script .= "<script>".$this->generate_table_script()."</script>";
-		$script .= "</div>";
-		echo $script;
-	}
-
-	private function generate_rows() {
-		$row = array();
-		for($i = 0; $i < $this->row_count; $i++) {
-			$string = "{";
-			$data = array();
-			foreach($this->headers as $head) {
-				if(!is_null($head->get_data($i))) {
-					$s = "\"".$head->get_name()."\"" . ": \"" . $head->get_data($i)."\"";
-					array_push($data, $s);
-				}
-			}
-			$string .= comma_seperate($data, true);
-			$string .= "}";
-			array_push($row, $string);
-		}
-		return comma_seperate($row, true);
-	}
-
 	private function header_exists($name) {
 		if(is_null($this->get_header($name))) {
 			return false;
@@ -130,31 +44,85 @@ class SortableTable {
 		return null;
 	}
 
-	private function generate_column_defs() {
-		$script = "			var myColumnDefs = [\n";
+	/****** Generate Data Set ******/
+
+	private function generate_data() {
+		$s .= "var data = [\n";
+
 		$array = array();
-		foreach($this->headers as $head) {
-			$name = $head->get_name();
-			$string = "					{key:\"$name\", sortable:true}";
-			array_push($array, $string);
+
+		for($i = 0; $i < $this->row_count; $i++) {
+			array_push($array, $this->generate_data_row($i));
 		}
-		$script .= comma_seperate($array, true);
-		$script .= "\n			];\n";
-		return $script;
+
+		$s .= comma_seperate($array, true);
+		$s .= "\n];";
+		return $s;
 	}
 
-	private function generate_schema() {
-		$script  = "		    myDataSource.responseSchema = {\n";
-		$script .= "		        fields: [";
+	private function generate_data_row($id) {
 		$array = array();
-		foreach($this->headers as $head) {
-			$name = $head->get_name();
-			$string = "\"$name\"";
+		foreach($this->headers as $h) {
+			array_push($array, $h->get_name().": '".$h->get_data($id)."'");
+		}
+		$s  = "{".comma_seperate($array, false)."}";
+		return $s;
+	}
+
+	/****** Generate Columns ******/
+
+	private function generate_cols() {
+		$array = array();
+		foreach($this->headers as $h) {
+			$string = "{key: '".$h->get_name()."', label: '".$h->get_name()."', sortable:true}";
 			array_push($array, $string);
 		}
-		$script .= comma_seperate($array, false);
-		$script .= "]\n";
-		$script .= "	    };\n";
+		$s .= "var cols = [\n";
+		$s .= comma_seperate($array, true);
+		$s .= "\n];\n";
+		return $s;
+	}
 
+	/****** Add Included Scripts ******/
+
+	private function add_scripts() {
+		$s  = "<script src='http://yui.yahooapis.com/3.13.0/build/yui/yui-min.js'></script>";
+
+		return $s;
+	}
+
+	/****** Generate Table Script ******/
+
+	private function generate_table_script() {
+		$s .= "var dt = new Y.DataTable({\n";
+		$s .= "    data: data,\n";
+		$s .= "    columns: cols\n";
+		$s .= "});\n\n";
+
+		$s .= "dt.render('#dtable');\n";
+		return $s;		
+	}
+
+	/****** Generate Load Script ******/
+
+	private function generate_load_script() {
+		$s  = "YUI().use('datatable', 'datatype-number-format', function (Y) {\n";
+		$s .= $this->generate_data() . "\n";
+		$s .= $this->generate_cols() . "\n";
+		$s .= $this->generate_table_script();
+		$s .= "});";
+	
+		return $s;
+	}
+
+	/****** Print Table ******/
+
+	public function print_table() {
+		$s  = $this->add_scripts() . "\n";
+		$s .= "<script>\n";
+		$s .= $this->generate_load_script();
+		$s .= "</script>";
+
+		echo $s;
 	}
 }
