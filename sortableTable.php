@@ -109,7 +109,7 @@ class SortableTable {
 
 	private function generate_load_script() {
 		$s = "";
-		$s .= "YUI().use('datatable-scroll', 'datatype-number-format', function (Y) {\n";
+		$s .= "YUI().use('datatable', 'datatable-scroll', 'datatype-number-format', function (Y) {\n";
 		$s .= $this->generate_data() . "\n";
 		$s .= $this->generate_cols() . "\n";
 		$s .= $this->generate_table_script();
