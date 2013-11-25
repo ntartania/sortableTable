@@ -63,9 +63,9 @@ class SortableTable {
 	private function generate_data_row($id) {
 		$array = array();
 		foreach($this->headers as $h) {
-			array_push($array, $h->get_name().": '".$h->get_data($id)."'");
+			array_push($array, "\"".$h->get_name()."\"".": \"".$h->get_data($id)."\"");
 		}
-		$s  = "{".comma_seperate($array, false)."}";
+		$s  = "{\n".comma_seperate($array, true)."\n}";
 		return $s;
 	}
 
@@ -74,7 +74,7 @@ class SortableTable {
 	private function generate_cols() {
 		$array = array();
 		foreach($this->headers as $h) {
-			$string = "{key: '".$h->get_name()."', label: '".$h->get_name()."', sortable:true}";
+			$string = "{key: '".$h->get_name()."', label: '".$h->get_name()."', sortable:true, allowHTML:true}";
 			array_push($array, $string);
 		}
 		$s .= "var cols = [\n";
@@ -96,7 +96,7 @@ class SortableTable {
 	private function generate_table_script() {
 		$s .= "var dt = new Y.DataTable({\n";
 		$s .= "    data: data,\n";
-		$s .= "    columns: cols\n";
+		$s .= "    columns: cols,\n";
 		$s .= "});\n\n";
 
 		$s .= "dt.render('#dtable');\n";
@@ -106,7 +106,8 @@ class SortableTable {
 	/****** Generate Load Script ******/
 
 	private function generate_load_script() {
-		$s  = "YUI().use('datatable', 'datatype-number-format', function (Y) {\n";
+		$s = "";
+		$s .= "YUI().use('datatable', 'datatype-number-format', function (Y) {\n";
 		$s .= $this->generate_data() . "\n";
 		$s .= $this->generate_cols() . "\n";
 		$s .= $this->generate_table_script();
@@ -118,7 +119,8 @@ class SortableTable {
 	/****** Print Table ******/
 
 	public function print_table() {
-		$s  = $this->add_scripts() . "\n";
+		$s = "";
+		//$s  .= $this->add_scripts() . "\n";
 		$s .= "<script>\n";
 		$s .= $this->generate_load_script();
 		$s .= "</script>";
