@@ -93,26 +93,28 @@ class SortableTable {
 
 	/****** Generate Table Script ******/
 
-	private function generate_table_script() {
+	private function generate_table_script($table_id) {
 		$s .= "var dt = new Y.DataTable({\n";
 		$s .= "    data: data,\n";
 		$s .= "    columns: cols,\n";
 		$s .= "    scrollable: 'x',\n";
-		$s .= "    width: '100%'\n";
+		//$s .= "    scrollable: true,\n";
+		$s .= "    width: '100%',\n";
+		//$s .= "	   height: '250px'\n";
 		$s .= "});\n\n";
 
-		$s .= "dt.render('#dtable');\n";
+		$s .= "dt.render('#$table_id');\n";
 		return $s;		
 	}
 
 	/****** Generate Load Script ******/
 
-	private function generate_load_script() {
+	private function generate_load_script($table_id) {
 		$s = "";
 		$s .= "YUI().use('datatable', 'datatable-scroll', 'datatype-number-format', function (Y) {\n";
 		$s .= $this->generate_data() . "\n";
 		$s .= $this->generate_cols() . "\n";
-		$s .= $this->generate_table_script();
+		$s .= $this->generate_table_script($table_id);
 		$s .= "});";
 	
 		return $s;
@@ -120,13 +122,17 @@ class SortableTable {
 
 	/****** Print Table ******/
 
-	public function print_table() {
+	public function print_table($table_id = "dtable") {
+		echo $this->get_table($table_id);
+	}
+
+	public function get_table($table_id = "dtable") {
 		$s = "";
 		//$s  .= $this->add_scripts() . "\n";
 		$s .= "<script>\n";
-		$s .= $this->generate_load_script();
+		$s .= $this->generate_load_script($table_id);
 		$s .= "</script>";
 
-		echo $s;
+		return $s;
 	}
 }
