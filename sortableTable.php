@@ -97,9 +97,9 @@ class SortableTable {
 		$s .= "var dt = new Y.DataTable({\n";
 		$s .= "    data: data,\n";
 		$s .= "    columns: cols,\n";
-		$s .= "    scrollable: 'x',\n";
+		//$s .= "    scrollable: 'x',\n";
 		//$s .= "    scrollable: true,\n";
-		$s .= "    width: '100%',\n";
+		//$s .= "    width: '100%',\n";
 		//$s .= "	   height: '250px'\n";
 		$s .= "});\n\n";
 
