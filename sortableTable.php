@@ -47,7 +47,7 @@ class SortableTable {
 	/****** Generate Data Set ******/
 
 	private function generate_data() {
-		$s .= "var data = [\n";
+		$s = "var data = [\n";
 
 		$array = array();
 
@@ -77,7 +77,7 @@ class SortableTable {
 			$string = "{key: '".$h->get_name()."', label: '".$h->get_name()."', sortable:true, allowHTML:true}";
 			array_push($array, $string);
 		}
-		$s .= "var cols = [\n";
+		$s = "var cols = [\n";
 		$s .= comma_seperate($array, true);
 		$s .= "\n];\n";
 		return $s;
@@ -94,7 +94,7 @@ class SortableTable {
 	/****** Generate Table Script ******/
 
 	private function generate_table_script($table_id) {
-		$s .= "var dt = new Y.DataTable({\n";
+		$s = "var dt = new Y.DataTable({\n";
 		$s .= "    data: data,\n";
 		$s .= "    columns: cols,\n";
 		//$s .= "    scrollable: 'x',\n";
