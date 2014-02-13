@@ -13,6 +13,18 @@ class SortableTable {
 		$this->row_count = 0;
 	}
 
+	public static function buildFromData($rows) {
+
+    	$instance = new self();
+    	foreach ($rows as $row){
+    		$instance->add_row($row);
+    	}
+    	//echo "sortabletable!!";
+    	return $instance;
+
+
+    }
+
 	public function add_header($name) {
 		if(!$this->header_exists($name)) {
 			array_push($this->headers,new Header($name));
@@ -21,6 +33,9 @@ class SortableTable {
 
 	public function add_row($row) {
 		foreach($row as $head => $value) {
+			//echo "head".$head;
+			//echo "value".$value;
+
 			$this->add_header($head);
 			$h = $this->get_header($head);
 			$h->add_data($value, $this->row_count);
